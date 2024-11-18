@@ -1,0 +1,3 @@
+#! TBD
+usd-core==24.11
+ovito==3.11.1
