@@ -24,6 +24,7 @@ void bodyForceWraper( int nBodies, float dt, Body *p_device){
 
     gridDimX = warpDim * numberOfSMs;
 
+    blockDimX = warpDim * warpDim; 
 
     //*    stride = gridDimX * blockDimX;
 
