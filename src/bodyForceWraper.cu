@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <cuda_runtime.h>
 #include <iostream>
 #include "body.cuh"
@@ -11,8 +12,6 @@ void bodyForceWraper( int nBodies, float dt, Body *p_device){
     int numberOfSMs;
     int gridDimX;
     int blockDimX;
-    int blockDimY;
-    int stride;
 
     CHECK_CUDA_ERROR( 
         cudaGetDevice(&deviceId));
@@ -23,16 +22,17 @@ void bodyForceWraper( int nBodies, float dt, Body *p_device){
     CHECK_CUDA_ERROR( 
         cudaDeviceGetAttribute(&warpDim, cudaDevAttrWarpSize, deviceId));
 
+    gridDimX = warpDim * numberOfSMs;
 
-    gridDimX = warpDim*numberOfSMs;
-    blockDimX =  sqrt(warpDim*warpDim); 
-    blockDimY =  sqrt(warpDim*warpDim);
-    stride = gridDimX * blockDimX;
+
+    //*    stride = gridDimX * blockDimX;
 
     dim3 dimGrid(gridDimX, 1, 1);
-    dim3 BodyForceDimBlock(blockDimX, blockDimY, 1);
 
-    bodyForceCUDA<<<dimGrid, BodyForceDimBlock>>>(p_device, dt, nBodies, stride);
+    dim3 BodyForceDimBlock(blockDimX, 1, 1);
+
+    // Llamada al kernel con los valores calculados
+    bodyForceCUDA<<<dimGrid, BodyForceDimBlock>>>(p_device, dt, nBodies);
 
     CHECK_CUDA_ERROR(
         cudaDeviceSynchronize());

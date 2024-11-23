@@ -4,7 +4,7 @@
 
 void bodyForceMalloc( int bytes, Body *p, Body *p_device){
 
-    cudaMalloc((void**)&p_device, bytes);
+    cudaMalloc(&p_device,bytes);
     cudaMemcpy(p_device, p, bytes, cudaMemcpyHostToDevice);
 
 }

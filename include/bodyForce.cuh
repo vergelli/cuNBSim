@@ -4,6 +4,6 @@
 
 #define SOFTENING 1e-9f
 
-__global__ void bodyForceCUDA(Body *p, float dt, int nBodies, int stride);
+__global__ void bodyForceCUDA(Body *p, float dt, int nBodies);
 
 #endif // INTEGRATE_CUH
