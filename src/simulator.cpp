@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <cstdlib> 
 #include "body.cuh"
 #include "config.hpp"
@@ -8,15 +9,15 @@
 int main() {
 
     int bytes = nBodies * sizeof(Body);
+    printf("%d Bytes\n", bytes);
     float *buf;
     buf = (float *)malloc(bytes);
     Body *p = (Body*)buf;
-    Body *p_device = nullptr;
+    Body *p_device;
 
     bodyForceMalloc(bytes, p, p_device);
 
     for (int iter = 0; iter < nIters; iter++) {
-
         bodyForceWraper( nBodies, dt, p_device);
         integrateWraper( nBodies, dt, p_device);
     };
