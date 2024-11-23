@@ -3,4 +3,5 @@
 *.usd
 bin/*
 profiling/*
-
+ejemplo_prints_c.c
+*.tree
