@@ -13,7 +13,7 @@ void initIntegrate(
 
     gridDimX = deviceProps.warpDim * deviceProps.numberOfSMs;
     integrateBlockDimX = deviceProps.warpDim * deviceProps.warpDim;
-
+    integrateStride = gridDimX * integrateBlockDimX;
 }
 
 void execIntegrate(
