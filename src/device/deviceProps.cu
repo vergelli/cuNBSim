@@ -1,4 +1,3 @@
-// src/device/deviceProps.cu
 #include <cuda_runtime.h>
 #include "cuda_utils.cuh" // Asegúrate de tener esta cabecera para CHECK_CUDA_ERROR
 #include "deviceProps.cuh"
