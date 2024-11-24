@@ -6,10 +6,12 @@ set SRC_DIR=..\src
 set KERNEL_DIR=..\kernels
 set OBJ_DIR=..\bin
 set INCLUDE_DIR=..\include
+set DEVICE_DIR= %SRC_DIR%\device
 
 :: Compilar los archivos
 nvcc -std=c++17 ^
 %SRC_DIR%\integrateWraper.cu ^
+%DEVICE_DIR%\deviceProps.cu ^
 %SRC_DIR%\bodyForceWraper.cu ^
 %SRC_DIR%\simulator.cpp ^
 %KERNEL_DIR%\bodyForce.cu ^

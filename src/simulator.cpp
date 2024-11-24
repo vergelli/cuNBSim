@@ -5,6 +5,7 @@
 #include "memory_management.cuh"
 #include "bodyForceWraper.cuh"
 #include "integrateWraper.cuh"
+#include "deviceProps.cuh"
 
 int main() {
 
@@ -15,13 +16,27 @@ int main() {
     Body *p = (Body*)buf;
     Body *p_device;
 
+    DeviceProperties deviceProps = getDeviceProps();
     bodyForceMalloc(bytes, p, p_device);
 
-    for (int iter = 0; iter < nIters; iter++) {
-        bodyForceWraper( nBodies, dt, p_device);
-        integrateWraper( nBodies, dt, p_device);
-    };
+    //* grid Dimensions
+    int gridDimX;
+    //* bodyForce
+    int bodyForceBlockDimX; 
+    //* Integrate
+    int integrateBlockDimX, integrateStride;
 
+    // Inicialización solo una vez
+    initBodyForce(gridDimX, bodyForceBlockDimX, deviceProps);
+    initIntegrate(gridDimX, integrateBlockDimX, integrateStride, deviceProps);
+
+    // Ciclo principal: solo ejecuta los kernels
+    for (int iter = 0; iter < nIters; iter++) {
+        execBodyForce(nBodies, dt, p_device, gridDimX, bodyForceBlockDimX);
+        execIntegrate(nBodies, dt, p_device, gridDimX, integrateBlockDimX, integrateStride);
+    }
+
+    // Liberar memoria
     cudaFreeMemRoutines(p_device);
     return 0;
 }
