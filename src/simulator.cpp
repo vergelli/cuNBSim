@@ -20,14 +20,16 @@ int main() {
 
     bodyForceMalloc(bytes, p, p_device);
 
-    //* grid Dimensions
+    //* All kernels
     int gridDimX;
-    //* bodyForce
-    int bodyForceBlockDimX; 
-    //* Integrate
+
+    //* bodyForce kernel
+    int bodyForceBlockDimX;
+
+    //* Integrate Kernel
     int integrateBlockDimX, integrateStride;
 
-    //~ Inicialización solo una vez
+    //~ Inicialización de parametros de configuracion de lanzamiento
     initBodyForce(gridDimX, bodyForceBlockDimX, deviceProps);
     initIntegrate(gridDimX, integrateBlockDimX, integrateStride, deviceProps);
 
@@ -38,7 +40,8 @@ int main() {
     }
 
     printf("Simulation terminated\n");
-    // Liberar memoria
+
+    //~ Rutinas de liberacion de memoria
     cudaFreeMemRoutines(p_device);
     return 0;
 }
