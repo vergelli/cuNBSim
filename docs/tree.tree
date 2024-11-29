@@ -1,0 +1,65 @@
+
+│   .gitignore
+│   CMakeLists.txt
+│   requirements.txt
+│
+├───.vscode
+│       settings.json
+│
+├───bin
+│       cuNBSim.exe
+│       cuNBSim.exp
+│       cuNBSim.lib
+│
+├───data
+├───docs
+│       README.md
+│
+├───include
+│       body.cuh
+│       bodyForce.cuh
+│       bodyForceWraper.cuh
+│       config.hpp
+│       cuda_utils.cuh
+│       data_collector.cuh
+│       deviceProps.cuh
+│       integrate.cuh
+│       integrateWraper.cuh
+│       memory_management.cuh
+│       simulator.hpp
+│
+├───kernels
+│       bodyForce.cu
+│       integrate.cu
+│       math_utils.cuh
+│       memory_management.cu
+│
+├───postprocess
+├───profiling
+│       1.pdf
+│       cuNBSim.ncu-proj
+│       cuNBSim_complete.nsys-rep
+│       cuNBSim_complete.sqlite
+│
+├───scripts
+│       run_compilation.bat
+│       run_profiling.bat
+│       run_sanitizer.bat
+│       run_simulation.bat
+│
+├───src
+│   │   simulator.cpp
+│   │
+│   ├───device
+│   │       bodyForceWraper.cu
+│   │       data_collector.cu
+│   │       deviceProps.cu
+│   │       integrateWraper.cu
+│   │
+│   └───host
+│           config.cpp
+│           utils.cpp
+│
+└───tests
+        test_kernels.cu
+        test_simulator.cpp
