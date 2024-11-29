@@ -1,6 +1,8 @@
 .vscode
 .obsidian
+cuNBSim.md
 *.usd
 bin/*
 profiling/*
-
+ejemplo_prints_c.c
+*.tree
