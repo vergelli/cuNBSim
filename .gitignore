@@ -2,6 +2,7 @@
 .obsidian
 cuNBSim.md
 *.usd
+*.csv
 bin/*
 profiling/*
 ejemplo_prints_c.c

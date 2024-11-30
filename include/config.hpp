@@ -1,15 +1,14 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
+#include <string> 
 
-const float dt = 0.01f;
-const int nIters = 100;
-const int nBodies = 256;
+extern float dt;
+extern int nBodies;
+extern int nIters;
+extern const std::string data_directory;
+extern const std::string default_config_path;
+extern const std::string simulation_data_file_name;
 
-//^ const int nBodies = 2<<11;
+void load_config_from_file(const std::string& config_file);
 
-//~ Declarar las variables como 'extern' (esto dice que estas variables están definidas en otro archivo)
-extern const char* data_directory;
-extern const char* simulation_data_file_name;
 #endif // CONFIG_HPP
-
-
