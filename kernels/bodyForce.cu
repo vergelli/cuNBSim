@@ -2,6 +2,7 @@
 #include "bodyForce.cuh"
 #include "body.cuh"
 
+
 __global__ void bodyForceCUDA(Body *p_device, float dt, int nBodies) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i < nBodies) {
@@ -14,8 +15,9 @@ __global__ void bodyForceCUDA(Body *p_device, float dt, int nBodies) {
             float distSqr = dx*dx + dy*dy + dz*dz + SOFTENING;
             float invDist = rsqrtf(distSqr);
             float invDist3 = invDist * invDist * invDist;
-
-            Fx += dx * invDist3; Fy += dy * invDist3; Fz += dz * invDist3;
+            Fx += dx * invDist3;
+            Fy += dy * invDist3;
+            Fz += dz * invDist3;
         }
 
         p_device[i].vx += dt * Fx;
