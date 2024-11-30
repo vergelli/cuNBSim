@@ -50,8 +50,6 @@ void logSimulationData(Body* p, int nBodies, int iter) {
     //* Validar si el archivo se cerró correctamente
     if (csvFile.fail()) {
         std::cerr << "ERROR: File could not close properly." << std::endl;
-    } else {
-        printf("Simulation data gracefully saved on %s\n", file_path.c_str());
     }
 }
 
