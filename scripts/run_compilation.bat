@@ -11,17 +11,20 @@ set HOST_DIR= %SRC_DIR%\host
 
 :: Compilar los archivos
 nvcc -std=c++17 ^
-%DEVICE_DIR%\integrateWraper.cu ^
 %DEVICE_DIR%\deviceProps.cu ^
+%DEVICE_DIR%\integrateWraper.cu ^
 %DEVICE_DIR%\bodyForceWraper.cu ^
+%DEVICE_DIR%\boxMullerWraper.cu ^
 %DEVICE_DIR%\data_collector.cu ^
-%SRC_DIR%\simulator.cpp ^
-%KERNEL_DIR%\bodyForce.cu ^
+%SRC_DIR%\simulator.cu ^
 %KERNEL_DIR%\integrate.cu ^
+%KERNEL_DIR%\bodyForce.cu ^
+%KERNEL_DIR%\boxMuller.cu ^
 %KERNEL_DIR%\memory_management.cu ^
 %HOST_DIR%\utils.cpp ^
 %HOST_DIR%\config.cpp ^
 -o %OBJ_DIR%\cuNBSim.exe ^
+-lcurand ^
 -I %INCLUDE_DIR% -O3 -arch=sm_80 -lineinfo -diag-suppress=611
 
 pause

@@ -1,12 +1,14 @@
+#include <curand_kernel.h>
 #include <iostream>
-#include <cstdlib> 
+#include <cstdlib>
 #include "body.cuh"
 #include "config.hpp"
 #include "memory_management.cuh"
+#include "data_collector.cuh"
+#include "deviceProps.cuh"
 #include "bodyForceWraper.cuh"
 #include "integrateWraper.cuh"
-#include "deviceProps.cuh"
-#include "data_collector.cuh"
+#include "boxMullerWraper.cuh"
 
 int main(int argc, char* argv[]) {
 
@@ -28,25 +30,33 @@ int main(int argc, char* argv[]) {
 
     DeviceProperties deviceProps = getDeviceProps();
 
-    bodyForceMalloc(bytes, p, p_device);
+    // Variables para la memoria del dispositivo
+    curandState *d_states;
 
-    //* All kernels
+    // Llamada a la función para reservar memoria en el dispositivo
+    bodyForceMalloc(bytes, p, p_device, d_states, nBodies);
+
+    //* GridsDim
     int gridDimX;
 
-    //* bodyForce kernel
-    int bodyForceBlockDimX;
+    //* BlocksDim
+    int BlockDimX;
 
-    //* Integrate Kernel
-    int integrateBlockDimX, integrateStride;
+    //* Strides
+    int integrateStride;
+
+    //~ Definiendo estado inicial de las particulas
+    initBoxMuller( gridDimX, BlockDimX, deviceProps);
+    execBoxMuller( nBodies, d_states, p_device, gridDimX, BlockDimX);
 
     //~ Inicialización de parametros de configuracion de lanzamiento
-    initBodyForce(gridDimX, bodyForceBlockDimX, deviceProps);
-    initIntegrate(gridDimX, integrateBlockDimX, integrateStride, deviceProps);
+    initBodyForce(gridDimX, BlockDimX, deviceProps);
+    initIntegrate(gridDimX, BlockDimX, integrateStride, deviceProps);
 
     //~ Ciclo principal: solo ejecuta los kernels
     for (int iter = 0; iter < nIters; iter++) {
-        execBodyForce(nBodies, dt, p_device, gridDimX, bodyForceBlockDimX);
-        execIntegrate(nBodies, dt, p_device, gridDimX, integrateBlockDimX, integrateStride);
+        execBodyForce(nBodies, dt, p_device, gridDimX, BlockDimX);
+        execIntegrate(nBodies, dt, p_device, gridDimX, BlockDimX, integrateStride);
 
         //~ Data recollection routines
         simulationDataCollection(
@@ -60,6 +70,6 @@ int main(int argc, char* argv[]) {
     printf("INFO - Simulation terminated\n");
 
     //~ Rutinas de liberacion de memoria
-    cudaFreeMemRoutines(p_device, buf);
+    cudaFreeMemRoutines(p_device,d_states, buf);
     return 0;
 }

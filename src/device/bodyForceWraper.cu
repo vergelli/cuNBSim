@@ -11,12 +11,9 @@ void initBodyForce(
     int &bodyForceBlockDimX, 
     DeviceProperties deviceProps) {
 
-    gridDimX = 2*deviceProps.warpDim; //* deviceProps.numberOfSMs;
+    gridDimX = 2*deviceProps.warpDim; //& deviceProps.numberOfSMs;
     bodyForceBlockDimX = deviceProps.warpDim * deviceProps.warpDim;
-
     printf("INFO - gridDimX: %d, bodyForceBlockDimX: %d\n", gridDimX, bodyForceBlockDimX);
-
-//numberOfBlocks = (nBodies + threadsPerBlock - 1) / threadsPerBlock;
 }
 
 void execBodyForce(
