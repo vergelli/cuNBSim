@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "body.cuh"
+#include "utils.hpp"
 #include "config.hpp"
 #include "memory_management.cuh"
 #include "data_collector.cuh"
@@ -65,6 +66,8 @@ int main(int argc, char* argv[]) {
             nBodies, 
             bytes, 
             iter);
+
+        printProgress(iter + 1, nIters);
     }
 
     printf("INFO - Simulation terminated\n");
