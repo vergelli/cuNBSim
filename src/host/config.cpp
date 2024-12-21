@@ -30,4 +30,7 @@ void load_config_from_file(const std::string& config_file) {
     if (config.contains("nIters")) {
         nIters = config["nIters"];
     }
+    if (config.contains("dt")) {
+        dt = config["dt"];
+    }
 }
