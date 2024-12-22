@@ -7,3 +7,6 @@ bin/*
 profiling/*
 ejemplo_prints_c.c
 *.tree
+requirements.txt
+*.jl
+*.mp4
