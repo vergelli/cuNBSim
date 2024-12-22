@@ -8,7 +8,7 @@
 namespace fs = std::filesystem;
 
 void logSimulationData(Body* p, int nBodies, int iter) {
-    
+
     //* Definir la ruta del archivo
     std::string file_path = std::string(data_directory) + simulation_data_file_name;
 
@@ -35,13 +35,13 @@ void logSimulationData(Body* p, int nBodies, int iter) {
 
     //* Si el archivo es nuevo, escribir la cabecera
     if (!fileExists) {
-        csvFile << "Iteration,BodyID,PosX,PosY,PosZ,VelX,VelY,VelZ\n";
+        csvFile << "Iteration,BodyID,PosX,PosY,PosZ,VelX,VelY,VelZ,mass\n";
     }
 
     //* Escribir los datos de la simulación en el archivo
     for (int i = 0; i < nBodies; i++) {
         csvFile << iter << "," << i << "," << p[i].x << "," << p[i].y << "," << p[i].z << "," 
-                << p[i].vx << "," << p[i].vy << "," << p[i].vz << "\n";
+                << p[i].vx << "," << p[i].vy << "," << p[i].vz << "," << p[i].mass << "\n";
     }
 
     //* Cerrar el archivo
