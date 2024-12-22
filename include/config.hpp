@@ -3,8 +3,9 @@
 #include <string> 
 
 extern float dt;
-extern int nBodies;
 extern int nIters;
+extern int nBodies;
+extern float max_particles_speed;
 extern const std::string data_directory;
 extern const std::string default_config_path;
 extern const std::string simulation_data_file_name;

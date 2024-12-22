@@ -1,5 +1,5 @@
-#ifndef INTEGRATE_CUH
-#define INTEGRATE_CUH
+#ifndef INTEGRATE_WRAPPER_CUH
+#define INTEGRATE_WRAPPER_CUH
 #include "body.cuh"
 #include "deviceProps.cuh"
 
@@ -7,4 +7,4 @@ void initIntegrate(int &gridDimX, int &integrateBlockDimX, int &integrateStride,
 
 void execIntegrate(int nBodies, float dt, Body *p_device, int gridDimX, int integrateBlockDimX, int stride);
 
-#endif // INTEGRATE_CUH
+#endif // INTEGRATE_WRAPPER_CUH

@@ -10,8 +10,10 @@ const  std::string simulation_data_file_name = "simulation_data.csv";
 const  std::string default_config_path = "../config/config.json";
 
 float dt = 0.001f;
+float max_particles_speed = 1;
 int nBodies = 256;
 int nIters = 10;
+
 
 void load_config_from_file(const std::string& config_file) {
     std::ifstream file(config_file);
@@ -32,5 +34,8 @@ void load_config_from_file(const std::string& config_file) {
     }
     if (config.contains("dt")) {
         dt = config["dt"];
+    }
+    if (config.contains("max_particles_speed")) {
+        max_particles_speed = config["max_particles_speed"];
     }
 }
