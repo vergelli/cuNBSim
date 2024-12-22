@@ -5,11 +5,14 @@
 #include "utils.hpp"
 #include "config.hpp"
 #include "memory_management.cuh"
-#include "data_collector.cuh"
 #include "deviceProps.cuh"
+#include "boxMullerWraper.cuh"
+#include "massWraper.cuh"
+#include "velocityWrapper.cuh"
 #include "bodyForceWraper.cuh"
 #include "integrateWraper.cuh"
-#include "boxMullerWraper.cuh"
+#include "data_collector.cuh"
+
 
 int main(int argc, char* argv[]) {
 
@@ -22,6 +25,7 @@ int main(int argc, char* argv[]) {
     int bytes = nBodies * sizeof(Body);
     printf("INFO - Configuration file path: %s \n", config_path.c_str());
     printf("INFO - %d Bytes for %d particles\n", bytes, nBodies);
+    printf("INFO - Particles max velocity = %f \n", max_particles_speed);
     printf("INFO - Iterations for simulation = %d and dt = %f \n", nIters, dt);
 
     float *buf;
@@ -46,11 +50,23 @@ int main(int argc, char* argv[]) {
     //* Strides
     int integrateStride;
 
-    //~ Definiendo estado inicial de las particulas
+    //~ Definiendo posicion inicial de las particulas
+    printf("INFO - Setting initial particles position\n");
     initBoxMuller( gridDimX, BlockDimX, deviceProps);
     execBoxMuller( nBodies, d_states, p_device, gridDimX, BlockDimX);
 
+    //~ Definiendo la masa inicial de las particulas
+    printf("INFO - Setting particles initial mass\n");
+    initMassKernelLaunch( gridDimX, BlockDimX, deviceProps);
+    massKernelLaunch( nBodies, p_device, gridDimX, BlockDimX);
+
+    //~ Definiendo la velocidad inicial de las particulas
+    printf("INFO - Setting particles initial velocity\n");
+    initVelocityKernelLaunch( gridDimX, BlockDimX, deviceProps);
+    velocityKernelLaunch( nBodies, p_device, gridDimX, BlockDimX, max_particles_speed);
+
     //~ Inicialización de parametros de configuracion de lanzamiento
+    printf("INFO - Preparing to start simulation\n");
     initBodyForce(gridDimX, BlockDimX, deviceProps);
     initIntegrate(gridDimX, BlockDimX, integrateStride, deviceProps);
 
