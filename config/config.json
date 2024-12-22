@@ -1,4 +1,4 @@
 
 {
-    "dt" : 0.001,"nBodies" : 4096,"nIters" : 100
+    "dt" : 0.001,"nBodies" : 5120,"nIters" : 3000, "max_particles_speed": 20
 }
