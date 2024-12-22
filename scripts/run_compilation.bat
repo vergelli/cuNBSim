@@ -12,14 +12,18 @@ set HOST_DIR= %SRC_DIR%\host
 :: Compilar los archivos
 nvcc -std=c++17 ^
 %DEVICE_DIR%\deviceProps.cu ^
-%DEVICE_DIR%\integrateWraper.cu ^
-%DEVICE_DIR%\bodyForceWraper.cu ^
 %DEVICE_DIR%\boxMullerWraper.cu ^
+%DEVICE_DIR%\massWraper.cu^
+%DEVICE_DIR%\velocityWrapper.cu ^
+%DEVICE_DIR%\bodyForceWraper.cu ^
+%DEVICE_DIR%\integrateWraper.cu ^
 %DEVICE_DIR%\data_collector.cu ^
 %SRC_DIR%\simulator.cu ^
-%KERNEL_DIR%\integrate.cu ^
-%KERNEL_DIR%\bodyForce.cu ^
 %KERNEL_DIR%\boxMuller.cu ^
+%KERNEL_DIR%\mass.cu ^
+%KERNEL_DIR%\velocity.cu ^
+%KERNEL_DIR%\bodyForce.cu ^
+%KERNEL_DIR%\integrate.cu ^
 %KERNEL_DIR%\memory_management.cu ^
 %HOST_DIR%\utils.cpp ^
 %HOST_DIR%\config.cpp ^
