@@ -26,13 +26,9 @@ __global__ void box_muller_kernel(Body* p_device, curandState* state, int nBodie
         float R2 = sqrtf(-2.0f * logf(u3));
         float theta2 = 2.0f * M_PI * u4;
 
-        //* Asignar a las posiciones y velocidades
+        //* Asignar a las posiciones
         p_device[i].x = R * cosf(theta);
         p_device[i].y = R * sinf(theta);
         p_device[i].z = R2 * cosf(theta2);
-
-        p_device[i].vx = R * cosf(theta2);
-        p_device[i].vy = R * sinf(theta2);
-        p_device[i].vz = R2 * sinf(theta2);
     }
 }
