@@ -15,7 +15,7 @@ __global__ void box_muller_kernel(Body* p_device, curandState* state, int nBodie
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i < nBodies) {
-        //* Generación de 2 pares de números uniformes usando curand_uniform
+        // Generación de 2 pares de números uniformes usando curand_uniform
         float u1 = curand_uniform(&state[i]);
         float u2 = curand_uniform(&state[i]);
         float R = sqrtf(-2.0f * logf(u1));
@@ -26,9 +26,9 @@ __global__ void box_muller_kernel(Body* p_device, curandState* state, int nBodie
         float R2 = sqrtf(-2.0f * logf(u3));
         float theta2 = 2.0f * M_PI * u4;
 
-        //* Asignar a las posiciones
-        p_device[i].x = R * cosf(theta);
-        p_device[i].y = R * sinf(theta);
-        p_device[i].z = R2 * cosf(theta2);
+        // Asignar a las posiciones con los factores de escala
+        p_device[i].x = SIGMA_X * R * cosf(theta);
+        p_device[i].y = SIGMA_Y * R * sinf(theta);
+        p_device[i].z = SIGMA_Z * R2 * cosf(theta2);
     }
 }
