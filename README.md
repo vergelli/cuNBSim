@@ -1,4 +1,4 @@
-# N-Body Simulator (CUDA)
+# cuda NBSim
 
 An N-Body simulator powered by CUDA devices. This simulator models the gravitational interactions between particles in a 3D space with various initial configurations. It is currently under active development.
 
@@ -15,7 +15,7 @@ This project is still in its early stages. Some features have been implemented, 
 
 These visualizations were rendered using [Makie.jl](https://docs.makie.org/v0.21/) and are not part of this project (although they may be included in the future idk).
 
-![Simulation Animation](postprocess/sim_anim_threshold_gravity.gif)
+![Simulation Animation](docs/sim_anim_threshold_gravity.gif)
 
 ## Future Work
 - Implement force optimizations

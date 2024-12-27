@@ -1,3 +1,4 @@
 #! TBD
 usd-core==24.11
 ovito==3.11.1
+bpy==2.82.1 #* Only works with Python 3.7
