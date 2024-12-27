@@ -51,22 +51,18 @@ int main(int argc, char* argv[]) {
     int integrateStride;
 
     //~ Definiendo posicion inicial de las particulas
-    printf("INFO - Setting initial particles position\n");
     initBoxMuller( gridDimX, BlockDimX, deviceProps);
     execBoxMuller( nBodies, d_states, p_device, gridDimX, BlockDimX);
 
     //~ Definiendo la masa inicial de las particulas
-    printf("INFO - Setting particles initial mass\n");
     initMassKernelLaunch( gridDimX, BlockDimX, deviceProps);
     massKernelLaunch( nBodies, p_device, gridDimX, BlockDimX);
 
     //~ Definiendo la velocidad inicial de las particulas
-    printf("INFO - Setting particles initial velocity\n");
     initVelocityKernelLaunch( gridDimX, BlockDimX, deviceProps);
     velocityKernelLaunch( nBodies, p_device, gridDimX, BlockDimX, max_particles_speed);
 
     //~ Inicialización de parametros de configuracion de lanzamiento
-    printf("INFO - Preparing to start simulation\n");
     initBodyForce(gridDimX, BlockDimX, deviceProps);
     initIntegrate(gridDimX, BlockDimX, integrateStride, deviceProps);
 
@@ -76,12 +72,7 @@ int main(int argc, char* argv[]) {
         execIntegrate(nBodies, dt, p_device, gridDimX, BlockDimX, integrateStride);
 
         //~ Data recollection routines
-        simulationDataCollection(
-            p, 
-            p_device, 
-            nBodies, 
-            bytes, 
-            iter);
+        simulationDataCollection(p, p_device, nBodies, bytes, iter);
 
         printProgress(iter + 1, nIters);
     }
