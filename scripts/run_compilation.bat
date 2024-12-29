@@ -12,6 +12,7 @@ set HOST_DIR= %SRC_DIR%\host
 :: Compilar los archivos
 nvcc -std=c++17 ^
 %DEVICE_DIR%\deviceProps.cu ^
+%DEVICE_DIR%\kernelsInit.cu ^
 %DEVICE_DIR%\boxMullerWraper.cu ^
 %DEVICE_DIR%\massWraper.cu^
 %DEVICE_DIR%\velocityWrapper.cu ^
