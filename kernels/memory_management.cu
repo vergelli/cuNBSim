@@ -4,7 +4,7 @@
 #include "cuda_utils.cuh"
 
 // Función que gestiona la reserva de memoria para el array de cuerpos y los estados de curand
-void bodyForceMalloc(int bytes, Body *p, Body *&p_device, curandState* &d_states, int nBodies) {
+void allocateMemoryForParticles(int bytes, Body *p, Body *&p_device, curandState* &d_states, int nBodies) {
 
     printf("INFO - Allocating particles state on GPU\n");
     CHECK_CUDA_ERROR(cudaMalloc((void**)&d_states, nBodies * sizeof(curandState)));

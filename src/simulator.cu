@@ -6,6 +6,7 @@
 #include "config.hpp"
 #include "memory_management.cuh"
 #include "deviceProps.cuh"
+#include "kernelsInit.cu"
 #include "boxMullerWraper.cuh"
 #include "massWraper.cuh"
 #include "velocityWrapper.cuh"
@@ -16,64 +17,45 @@
 
 int main(int argc, char* argv[]) {
 
-    //~ Si se pasa un argumento, lo usamos como path de la configuración
     std::string config_path = (argc > 1) ? argv[1] : default_config_path;
-
-    //~ Cargar la configuración desde el archivo (usando el path que corresponda)
     load_config_from_file(config_path);
 
     int bytes = nBodies * sizeof(Body);
     printf("INFO - Configuration file path: %s \n", config_path.c_str());
     printf("INFO - %d Bytes for %d particles\n", bytes, nBodies);
     printf("INFO - Particles max velocity = %f \n", max_particles_speed);
-    printf("INFO - Iterations for simulation = %d and dt = %f \n", nIters, dt);
+    printf("INFO - Iterations = %d and dt = %f \n", nIters, dt);
 
     float *buf;
     buf = (float *)malloc(bytes);
     Body *p = (Body*)buf;
     Body *p_device;
-
     DeviceProperties deviceProps = getDeviceProps();
-
-    // Variables para la memoria del dispositivo
     curandState *d_states;
 
-    // Llamada a la función para reservar memoria en el dispositivo
-    bodyForceMalloc(bytes, p, p_device, d_states, nBodies);
+    allocateMemoryForParticles(bytes, p, p_device, d_states, nBodies);
 
-    //* GridsDim
     int gridDimX;
-
-    //* BlocksDim
-    int BlockDimX;
-
-    //* Strides
+    int blockDimX;
     int integrateStride;
 
+    //~ Inicializacion de los parametros de lanzamiento de los kernels
+    kernelsLaunchParamsInit(gridDimX, blockDimX, integrateStride, deviceProps);
+
     //~ Definiendo posicion inicial de las particulas
-    initBoxMuller( gridDimX, BlockDimX, deviceProps);
-    execBoxMuller( nBodies, d_states, p_device, gridDimX, BlockDimX);
+    execBoxMuller( nBodies, d_states, p_device, gridDimX, blockDimX);
 
     //~ Definiendo la masa inicial de las particulas
-    initMassKernelLaunch( gridDimX, BlockDimX, deviceProps);
-    massKernelLaunch( nBodies, p_device, gridDimX, BlockDimX);
+    massKernelLaunch( nBodies, p_device, gridDimX, blockDimX);
 
     //~ Definiendo la velocidad inicial de las particulas
-    initVelocityKernelLaunch( gridDimX, BlockDimX, deviceProps);
-    velocityKernelLaunch( nBodies, p_device, gridDimX, BlockDimX, max_particles_speed);
+    velocityKernelLaunch( nBodies, p_device, gridDimX, blockDimX, max_particles_speed);
 
-    //~ Inicialización de parametros de configuracion de lanzamiento
-    initBodyForce(gridDimX, BlockDimX, deviceProps);
-    initIntegrate(gridDimX, BlockDimX, integrateStride, deviceProps);
-
-    //~ Ciclo principal: solo ejecuta los kernels
+    //~ Ciclo principal
     for (int iter = 0; iter < nIters; iter++) {
-        execBodyForce(nBodies, dt, p_device, gridDimX, BlockDimX);
-        execIntegrate(nBodies, dt, p_device, gridDimX, BlockDimX, integrateStride);
-
-        //~ Data recollection routines
+        execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
+        execIntegrate(nBodies, dt, p_device, gridDimX, blockDimX, integrateStride);
         simulationDataCollection(p, p_device, nBodies, bytes, iter);
-
         printProgress(iter + 1, nIters);
     }
 
