@@ -6,16 +6,6 @@
 #include "cuda_utils.cuh"
 #include "deviceProps.cuh"
 
-void initVelocityKernelLaunch(
-    int &gridDimX, 
-    int &VelocityDimX, 
-    DeviceProperties deviceProps) {
-
-    gridDimX = 2*deviceProps.warpDim;
-    VelocityDimX = deviceProps.warpDim * deviceProps.warpDim;
-    printf("INFO - gridDimX: %d, VelocityDimX: %d\n", gridDimX, VelocityDimX);
-}
-
 void velocityKernelLaunch(
     int nBodies, 
     Body *p_device, 

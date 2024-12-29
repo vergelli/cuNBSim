@@ -5,17 +5,6 @@
 #include "cuda_utils.cuh"
 #include "deviceProps.cuh"
 
-void initIntegrate(
-    int &gridDimX, 
-    int &integrateBlockDimX, 
-    int &integrateStride, 
-    DeviceProperties deviceProps){
-
-    gridDimX = deviceProps.warpDim * deviceProps.numberOfSMs;
-    integrateBlockDimX = deviceProps.warpDim * deviceProps.warpDim;
-    integrateStride = gridDimX * integrateBlockDimX;
-}
-
 void execIntegrate(
     int nBodies, 
     float dt, 

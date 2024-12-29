@@ -6,16 +6,6 @@
 #include "cuda_utils.cuh"
 #include "deviceProps.cuh"
 
-void initMassKernelLaunch(
-    int &gridDimX, 
-    int &massDimX, 
-    DeviceProperties deviceProps) {
-
-    gridDimX = 2*deviceProps.warpDim;
-    massDimX = deviceProps.warpDim * deviceProps.warpDim;
-    printf("INFO - gridDimX: %d, massDimX: %d\n", gridDimX, massDimX);
-}
-
 void massKernelLaunch(
     int nBodies, 
     Body *p_device, 

@@ -6,16 +6,6 @@
 #include "cuda_utils.cuh"
 #include "deviceProps.cuh"
 
-void initBodyForce(
-    int &gridDimX, 
-    int &bodyForceBlockDimX, 
-    DeviceProperties deviceProps) {
-
-    gridDimX = 2*deviceProps.warpDim; //& deviceProps.numberOfSMs;
-    bodyForceBlockDimX = deviceProps.warpDim * deviceProps.warpDim;
-    printf("INFO - gridDimX: %d, bodyForceBlockDimX: %d\n", gridDimX, bodyForceBlockDimX);
-}
-
 void execBodyForce(
     int nBodies, 
     float dt, 

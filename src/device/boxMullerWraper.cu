@@ -7,16 +7,6 @@
 #include "cuda_utils.cuh"
 #include "deviceProps.cuh"
 
-void initBoxMuller(
-    int &gridDimX, 
-    int &boxMullerBlockDimX, 
-    DeviceProperties deviceProps) {
-
-    gridDimX = 2*deviceProps.warpDim; //& deviceProps.numberOfSMs;
-    boxMullerBlockDimX = deviceProps.warpDim * deviceProps.warpDim;
-    printf("INFO - gridDimX: %d, boxMullerBlockDimX: %d\n", gridDimX, boxMullerBlockDimX);
-}
-
 void execBoxMuller(
     int nBodies, 
     curandState* d_state,
