@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include "validation.hpp"
 #include "json.hpp"
 #include <iostream>
 #include <fstream>
@@ -24,6 +25,8 @@ void load_config_from_file(const std::string& config_file) {
 
     nlohmann::json config;
     file >> config;
+
+    config_file_validation_routines(config);
 
     // Leer los valores desde el archivo JSON
     if (config.contains("nBodies")) {
