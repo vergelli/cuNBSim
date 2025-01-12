@@ -14,30 +14,21 @@
 #include "integrateWraper.cuh"
 #include "data_collector.cuh"
 
-
 int main(int argc, char* argv[]) {
 
     std::string config_path = (argc > 1) ? argv[1] : default_config_path;
-    load_config_from_file(config_path);
+
+    DeviceProperties deviceProps = getDeviceProps();
+    load_config_from_file(config_path, deviceProps);
 
     int bytes = nBodies * sizeof(Body);
-    printf("INFO - Configuration file path: %s \n", config_path.c_str());
-    printf("INFO - %d Bytes for %d particles\n", bytes, nBodies);
-    printf("INFO - Particles max velocity = %f \n", max_particles_speed);
-    printf("INFO - Iterations = %d and dt = %f \n", nIters, dt);
-
     float *buf;
     buf = (float *)malloc(bytes);
     Body *p = (Body*)buf;
     Body *p_device;
-    DeviceProperties deviceProps = getDeviceProps();
     curandState *d_states;
 
     allocateMemoryForParticles(bytes, p, p_device, d_states, nBodies);
-
-    int gridDimX;
-    int blockDimX;
-    int integrateStride;
 
     //~ Inicializacion de los parametros de lanzamiento de los kernels
     kernelsLaunchParamsInit(gridDimX, blockDimX, integrateStride, deviceProps);
