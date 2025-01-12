@@ -1,5 +1,6 @@
 #include "config.hpp"
 #include "json.hpp"
+#include "deviceProps.cuh"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -255,7 +256,7 @@ void simulation_values_validations(const nlohmann::json& config) {
     }
 }
 
-void device_values_validations(const nlohmann::json& config) {
+void device_values_validations(const nlohmann::json& config, DeviceProperties deviceProps) {
     std::cout << "INFO - Checking device values." << std::endl;
 
     if (!config["device"]["launch-params-automatic"].is_boolean()) {
@@ -290,6 +291,62 @@ void device_values_validations(const nlohmann::json& config) {
         std::cerr << "ERROR - 'integrateStride' should be an integer." << std::endl;
         exit(1);
     }
+
+    std::cout << "INFO - Checking device values against detected CUDA device" << std::endl;
+    {
+        int gridDimX = config["device"]["launch-params-manual"]["gridDimX"];
+        int gridDimY = config["device"]["launch-params-manual"]["gridDimY"];
+        int gridDimZ = config["device"]["launch-params-manual"]["gridDimZ"];
+        int blockDimX = config["device"]["launch-params-manual"]["blockDimX"];
+        int blockDimY = config["device"]["launch-params-manual"]["blockDimY"];
+        int blockDimZ = config["device"]["launch-params-manual"]["blockDimZ"];
+        int totalThreads = blockDimX * blockDimY * blockDimZ;
+
+        if ((gridDimX <= 1 && gridDimY <= 1 && gridDimZ <= 1) || 
+            (blockDimX <= 1 && blockDimY <= 1 && blockDimZ <= 1)) {
+            std::cerr << "ERROR - At least one of the grid dimensions and block dimensions must be greater than 1." << std::endl;
+            exit(1);
+        }
+
+        if (gridDimX > deviceProps.maxGridDimX || gridDimY > deviceProps.maxGridDimY || gridDimZ > deviceProps.maxGridDimZ) {
+            std::cerr << "ERROR - Grid dimensions exceed the maximum allowed values." << std::endl;
+            exit(1);
+        }
+
+        if (blockDimX > deviceProps.maxBlockDimX || blockDimY > deviceProps.maxBlockDimY || blockDimZ > deviceProps.maxBlockDimZ) {
+            std::cerr << "ERROR - Block dimensions exceed the maximum allowed values." << std::endl;
+            exit(1);
+        }
+
+        if (gridDimX == 0 || gridDimY == 0 || gridDimZ == 0 || 
+            blockDimX == 0 || blockDimY == 0 || blockDimZ == 0) {
+            std::cerr << "ERROR - None of the grid or block dimensions can be zero." << std::endl;
+            exit(1);
+        }
+
+        //~ Dimensionality validation
+        //& 1D
+        if (blockDimY == 1 && blockDimZ == 1) {
+            if (blockDimX > 1024) {
+                throw std::runtime_error("Error: Exceeding max threads for 1D block (1024 threads max).");
+            }
+            std::cout << "Valid 1D block. Total threads: " << totalThreads << std::endl;
+        }
+        //& 2D
+        else if (blockDimZ == 1) {
+            if (blockDimX > 32 || blockDimY > 32 || totalThreads > 1024) {
+                throw std::runtime_error("Error: Exceeding max threads for 2D block (32x32 threads max, 1024 threads total).");
+            }
+            std::cout << "Valid 2D block. Total threads: " << totalThreads << std::endl;
+        }
+        //& 3D
+        else {
+            if (blockDimX > 10 || blockDimY > 10 || blockDimZ > 10 || totalThreads > 1024) {
+                throw std::runtime_error("Error: Exceeding max threads for 3D block (10x10x10 threads max, 1024 threads total).");
+            }
+            std::cout << "Valid 3D block. Total threads: " << totalThreads << std::endl;
+        }
+    }
 }
 
 //& Switches validations ===============================================================================
@@ -321,7 +378,7 @@ void switches_validations(const nlohmann::json& config) {
 
 //& Validation routines main function ===============================================================================
 
-void config_file_validation_routines(const nlohmann::json& config) {
+void config_file_validation_routines(const nlohmann::json& config, DeviceProperties deviceProps) {
 
     std::cout << "INFO - Starting configuration file validations." << std::endl;
     std::cout << "INFO - Checking mandatory fields." << std::endl;
@@ -334,10 +391,12 @@ void config_file_validation_routines(const nlohmann::json& config) {
 
     io_values_validations(config);
     simulation_values_validations(config);
-    device_values_validations(config);
+    device_values_validations(config, deviceProps);
 
     std::cout << "INFO - Checking configuration switches." << std::endl;
 
     switches_validations(config);
+
+    std::cout << "INFO - Configuration file is valid." << std::endl;
 
 }
