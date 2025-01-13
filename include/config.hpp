@@ -1,6 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 #include <string> 
+#include "json.hpp"
+#include "deviceProps.cuh"
 
 extern const std::string default_config_path;
 
@@ -30,5 +32,10 @@ extern float MASS_SOFTENING;
 extern bool launch_params_automatic;
 
 void load_config_from_file(const std::string& config_file, DeviceProperties deviceProps);
+
+void initialize_default_values();
+
+void initialize_configuration_variables(const nlohmann::json& config);
+
 
 #endif // CONFIG_HPP
