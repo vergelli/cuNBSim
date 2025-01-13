@@ -328,23 +328,23 @@ void device_values_validations(const nlohmann::json& config, DeviceProperties de
         //& 1D
         if (blockDimY == 1 && blockDimZ == 1) {
             if (blockDimX > 1024) {
-                throw std::runtime_error("Error: Exceeding max threads for 1D block (1024 threads max).");
+                throw std::runtime_error("ERROR - Exceeding max threads for 1D block (1024 threads max).");
             }
-            std::cout << "Valid 1D block. Total threads: " << totalThreads << std::endl;
+            std::cout << "INFO - Valid 1D block. Total threads: " << totalThreads << std::endl;
         }
         //& 2D
         else if (blockDimZ == 1) {
             if (blockDimX > 32 || blockDimY > 32 || totalThreads > 1024) {
-                throw std::runtime_error("Error: Exceeding max threads for 2D block (32x32 threads max, 1024 threads total).");
+                throw std::runtime_error("ERROR - Exceeding max threads for 2D block (32x32 threads max, 1024 threads total).");
             }
-            std::cout << "Valid 2D block. Total threads: " << totalThreads << std::endl;
+            std::cout << "INFO - Valid 2D block. Total threads: " << totalThreads << std::endl;
         }
         //& 3D
         else {
             if (blockDimX > 10 || blockDimY > 10 || blockDimZ > 10 || totalThreads > 1024) {
-                throw std::runtime_error("Error: Exceeding max threads for 3D block (10x10x10 threads max, 1024 threads total).");
+                throw std::runtime_error("ERROR - Exceeding max threads for 3D block (10x10x10 threads max, 1024 threads total).");
             }
-            std::cout << "Valid 3D block. Total threads: " << totalThreads << std::endl;
+            std::cout << "INFO - Valid 3D block. Total threads: " << totalThreads << std::endl;
         }
     }
 }
@@ -352,12 +352,15 @@ void device_values_validations(const nlohmann::json& config, DeviceProperties de
 //& Switches validations ===============================================================================
 
 void validate_switches(const nlohmann::json& switches) {
+    std::cout << "DEBUG - Starting switch validation." << std::endl;
     int true_count = 0;
     for (const auto& item : switches.items()) {
+        std::cout << "DEBUG - Checking switch: " << item.key() << " with value: " << item.value() << std::endl;
         if (item.value()) {
             true_count++;
         }
     }
+    std::cout << "DEBUG - Number of true switches: " << true_count << std::endl;
     if (true_count != 1) {
         std::cerr << "ERROR - Exactly one switch must be true in the following options: ";
         for (const auto& item : switches.items()) {
@@ -366,13 +369,18 @@ void validate_switches(const nlohmann::json& switches) {
         std::cerr << std::endl;
         exit(1);
     }
+    std::cout << "DEBUG - Switch validation completed successfully." << std::endl;
 }
 
 void switches_validations(const nlohmann::json& config) {
-    std::cout << "INFO - Checking configuration switches." << std::endl;
 
     validate_switches(config["simulation"]["position"]);
+    std::cout << "DEBUG - validate_switches PASSED." << std::endl;
+
     validate_switches(config["simulation"]["numeric-integration"]);
+    std::cout << "DEBUG - validate_switches PASSED." << std::endl;
+
+    std::cout << "INFO - All switches valid." << std::endl;
 
 }
 
