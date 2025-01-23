@@ -28,6 +28,8 @@ nvcc -std=c++17 ^
 %KERNEL_DIR%\memory_management.cu ^
 %HOST_DIR%\utils.cpp ^
 %HOST_DIR%\config.cpp ^
+%HOST_DIR%\globals.cpp ^
+%HOST_DIR%\validation.cpp ^
 -o %OBJ_DIR%\cuNBSim.exe ^
 -lcurand ^
 -I %INCLUDE_DIR% -O3 -arch=sm_80 -lineinfo -diag-suppress=611
