@@ -1,6 +1,7 @@
 .vscode
 .idea
 .obsidian
+cmake-build-debug
 cuNBSim.md
 *.usd
 *.csv
