@@ -4,7 +4,7 @@
 #include "deviceProps.cuh"
 #include <iostream>
 #include <fstream>
-#include <string> 
+#include <string>
 
 void initialize_default_values() {
 
@@ -20,46 +20,83 @@ void initialize_default_values() {
 
 void initialize_configuration_variables(const nlohmann::json& config) {
 
-    std::cout << "INFO - Initializing configuration variables" << std::endl;
+    try {
+        std::cout << "INFO - Initializing configuration variables" << std::endl;
 
-    nBodies = config["simulation"]["nBodies"];
-    nIters = config["simulation"]["nIters"];
-    dt = config["simulation"]["dt"];
-    //* position_initializer ------------------------------------------
-    for (const auto& item : config["simulation"]["position"].items()) {
-        if (item.value().contains("on") && item.value()["on"]) {
-            position_initializer = item.key();
-            break;
+        std::cout << "DEBUG - Loading nBodies" << std::endl;
+        nBodies = config["simulation"]["nBodies"];
+        
+        std::cout << "DEBUG - Loading nIters" << std::endl;
+        nIters = config["simulation"]["nIters"];
+        
+        std::cout << "DEBUG - Loading dt" << std::endl;
+        dt = config["simulation"]["dt"];
+        
+        //* position_initializer ------------------------------------------
+        std::cout << "DEBUG - Looking for position initializer" << std::endl;
+        for (const auto& item : config["simulation"]["position"].items()) {
+            if (item.value().contains("on") && item.value()["on"]) {
+                position_initializer = item.key();
+                break;
+            }
         }
-    }
-    if (position_initializer == "box-muller") {
-        position_std_dev_x = config["simulation"]["position"]["box-muller"]["position_std_dev_x"];
-        position_std_dev_y = config["simulation"]["position"]["box-muller"]["position_std_dev_y"];
-        position_std_dev_z = config["simulation"]["position"]["box-muller"]["position_std_dev_z"];
-        pi_value = config["simulation"]["position"]["box-muller"]["pi_value"];
-    }
-    max_particles_speed = config["simulation"]["velocity"]["max_particles_speed"];
-    MASS_SOFTENING = config["simulation"]["mass"]["mass_softening"];
-    G = config["simulation"]["force"]["G"];
-    SOFTENING = config["simulation"]["force"]["SOFTENING"];
-    MIN_DISTANCE_THRESHOLD = config["simulation"]["force"]["MIN_DISTANCE_TRESHOLD"];
-    //* numeric integration ------------------------------------------
-    for (const auto& item : config["simulation"]["numeric-integration"].items()) {
-        if (item.value().contains("on") && item.value()["on"]) {
-            numerical_integrator = item.key();
-            break;
+        std::cout << "DEBUG - position_initializer: " << position_initializer << std::endl;
+        
+        if (position_initializer == "box-muller") {
+            std::cout << "DEBUG - Loading box-muller parameters" << std::endl;
+            position_std_dev_x = config["simulation"]["position"]["box-muller"]["position_std_dev_x"];
+            position_std_dev_y = config["simulation"]["position"]["box-muller"]["position_std_dev_y"];
+            position_std_dev_z = config["simulation"]["position"]["box-muller"]["position_std_dev_z"];
+            pi_value = config["simulation"]["position"]["box-muller"]["pi_value"];
         }
+
+        std::cout << "DEBUG - Loading max_particles_speed" << std::endl;
+        max_particles_speed = config["simulation"]["velocity"]["max_particles_speed"];
+        
+        std::cout << "DEBUG - Loading MASS_SOFTENING" << std::endl;
+        MASS_SOFTENING = config["simulation"]["mass"]["MASS_SOFTENING"];
+
+        std::cout << "DEBUG - Loading G" << std::endl;
+        G = config["simulation"]["force"]["G"];
+        
+        std::cout << "DEBUG - Loading SOFTENING" << std::endl;
+        SOFTENING = config["simulation"]["force"]["SOFTENING"];
+        
+        std::cout << "DEBUG - Loading MIN_DISTANCE_THRESHOLD" << std::endl;
+        MIN_DISTANCE_THRESHOLD = config["simulation"]["force"]["MIN_DISTANCE_THRESHOLD"];
+
+        //* numeric integration ------------------------------------------
+        std::cout << "DEBUG - Looking for numeric integrator" << std::endl;
+        for (const auto& item : config["simulation"]["numeric-integration"].items()) {
+            if (item.value().contains("on") && item.value()["on"]) {
+                numerical_integrator = item.key();
+                break;
+            }
+        }
+        std::cout << "DEBUG - numerical_integrator: " << numerical_integrator << std::endl;
+        
+        //* device --------------------------------------------------------
+        std::cout << "DEBUG - Loading launch_params_automatic" << std::endl;
+        launch_params_automatic = config["device"]["launch-params-automatic"];
+        
+        if (!launch_params_automatic) {
+            std::cout << "DEBUG - Loading manual launch parameters" << std::endl;
+            gridDimX = config["device"]["launch-params-manual"]["gridDimX"];
+            blockDimX = config["device"]["launch-params-manual"]["blockDimX"];
+            gridDimY = config["device"]["launch-params-manual"]["gridDimY"];
+            blockDimY = config["device"]["launch-params-manual"]["blockDimY"];
+            gridDimZ = config["device"]["launch-params-manual"]["gridDimZ"];
+            blockDimZ = config["device"]["launch-params-manual"]["blockDimZ"];
+            integrateStride = config["device"]["launch-params-manual"]["IntegrateStride"];
+        }
+
+        std::cout << "INFO - Configuration values initialized successfully." << std::endl;
     }
-    //* device --------------------------------------------------------
-    launch_params_automatic = config["device"]["launch-params-automatic"];
-    if (!launch_params_automatic) {
-        gridDimX = config["device"]["launch-params-manual"]["gridDimX"];
-        blockDimX = config["device"]["launch-params-manual"]["blockDimX"];
-        gridDimY = config["device"]["launch-params-manual"]["gridDimY"];
-        blockDimY = config["device"]["launch-params-manual"]["blockDimY"];
-        gridDimZ = config["device"]["launch-params-manual"]["gridDimZ"];
-        blockDimZ = config["device"]["launch-params-manual"]["blockDimZ"];
-        integrateStride = config["device"]["launch-params-manual"]["IntegrateStride"];
+    catch (const nlohmann::json::exception& e) {
+        std::cerr << "JSON exception caught: " << e.what() << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Exception caught during initialization: " << e.what() << std::endl;
     }
 
     std::cout << "INFO - Configuration values initialized:" << std::endl;
@@ -89,6 +126,7 @@ void initialize_configuration_variables(const nlohmann::json& config) {
         std::cout << "INFO - blockDimZ: " << blockDimZ << std::endl;
         std::cout << "INFO - integrateStride: " << integrateStride << std::endl;
     }
+
 }
 
 void load_config_from_file(const std::string& config_file, DeviceProperties deviceProps) {
