@@ -78,8 +78,8 @@ void simulation_fields_validations(const nlohmann::json& config) {
             std::cerr << "ERROR - 'force' section does not contain 'SOFTENING' field." << std::endl;
             exit(1);
         }
-        if (!config["simulation"]["force"].contains("MIN_DISTANCE_TRESHOLD")) {
-            std::cerr << "ERROR - 'force' section does not contain 'MIN_DISTANCE_TRESHOLD' field." << std::endl;
+        if (!config["simulation"]["force"].contains("MIN_DISTANCE_THRESHOLD")) {
+            std::cerr << "ERROR - 'force' section does not contain 'MIN_DISTANCE_THRESHOLD' field." << std::endl;
             exit(1);
         }
     }
@@ -239,8 +239,8 @@ void simulation_values_validations(const nlohmann::json& config) {
         std::cerr << "ERROR - 'SOFTENING' in 'force' should be a number." << std::endl;
         exit(1);
     }
-    if (!config["simulation"]["force"]["MIN_DISTANCE_TRESHOLD"].is_number()) {
-        std::cerr << "ERROR - 'MIN_DISTANCE_TRESHOLD' in 'force' should be a number." << std::endl;
+    if (!config["simulation"]["force"]["MIN_DISTANCE_THRESHOLD"].is_number()) {
+        std::cerr << "ERROR - 'MIN_DISTANCE_THRESHOLD' in 'force' should be a number." << std::endl;
         exit(1);
     }
 
@@ -356,10 +356,22 @@ void validate_switches(const nlohmann::json& switches) {
     int true_count = 0;
     for (const auto& item : switches.items()) {
         std::cout << "DEBUG - Checking switch: " << item.key() << " with value: " << item.value() << std::endl;
-        if (item.value()) {
-            true_count++;
+
+        //? Accedemos a la clave 'on' del objeto, asumiendo que todos los switches tienen esa clave
+        if (item.value().contains("on") && item.value()["on"].is_boolean()) {
+            bool is_on = item.value()["on"];
+            std::cout << "DEBUG - 'on' value for " << item.key() << ": " << is_on << std::endl;
+
+            if (is_on) {
+                true_count++;
+                std::cout << "DEBUG - true_count: " << true_count << std::endl;
+            }
+        } else {
+            std::cerr << "ERROR - Switch " << item.key() << " does not contain a valid 'on' boolean value." << std::endl;
+            exit(1);
         }
     }
+
     std::cout << "DEBUG - Number of true switches: " << true_count << std::endl;
     if (true_count != 1) {
         std::cerr << "ERROR - Exactly one switch must be true in the following options: ";
@@ -371,6 +383,7 @@ void validate_switches(const nlohmann::json& switches) {
     }
     std::cout << "DEBUG - Switch validation completed successfully." << std::endl;
 }
+
 
 void switches_validations(const nlohmann::json& config) {
 
