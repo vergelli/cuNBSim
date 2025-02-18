@@ -18,6 +18,7 @@ nvcc -std=c++17 ^
 %DEVICE_DIR%\velocityWrapper.cu ^
 %DEVICE_DIR%\bodyForceWraper.cu ^
 %DEVICE_DIR%\integrateWraper.cu ^
+%DEVICE_DIR%\integratorLeapFrogWraper.cu ^
 %DEVICE_DIR%\data_collector.cu ^
 %SRC_DIR%\simulator.cu ^
 %KERNEL_DIR%\boxMuller.cu ^
@@ -25,6 +26,7 @@ nvcc -std=c++17 ^
 %KERNEL_DIR%\velocity.cu ^
 %KERNEL_DIR%\bodyForce.cu ^
 %KERNEL_DIR%\integrate.cu ^
+%KERNEL_DIR%\integratorLeapFrog.cu ^
 %KERNEL_DIR%\memory_management.cu ^
 %HOST_DIR%\utils.cpp ^
 %HOST_DIR%\config.cpp ^
