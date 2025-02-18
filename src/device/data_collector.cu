@@ -7,7 +7,7 @@
 #include "cuda_utils.cuh"
 namespace fs = std::filesystem;
 
-void logSimulationData(Body* p, int nBodies, int iter) {
+void logSimulationData(Body* p, int nBodies, int iter, std::string numerical_integrator) {
 
     //* Definir la ruta del archivo
     std::string file_path = std::string(data_directory) + simulation_data_file_name;
@@ -33,15 +33,25 @@ void logSimulationData(Body* p, int nBodies, int iter) {
         return;
     }
 
-    //* Si el archivo es nuevo, escribir la cabecera
-    if (!fileExists) {
-        csvFile << "Iteration,BodyID,PosX,PosY,PosZ,VelX,VelY,VelZ,mass\n";
-    }
-
-    //* Escribir los datos de la simulación en el archivo
-    for (int i = 0; i < nBodies; i++) {
-        csvFile << iter << "," << i << "," << p[i].x << "," << p[i].y << "," << p[i].z << "," 
-                << p[i].vx << "," << p[i].vy << "," << p[i].vz << "," << p[i].mass << "\n";
+    if (numerical_integrator == "euler-explicit") {
+        if (!fileExists) {
+            csvFile << "Iteration,BodyID,PosX,PosY,PosZ,VelX,VelY,VelZ,mass\n";
+        }
+        //* Escribir los datos de la simulación en el archivo
+        for (int i = 0; i < nBodies; i++) {
+            csvFile << iter << "," << i << "," << p[i].x << "," << p[i].y << "," << p[i].z << "," 
+                    << p[i].vx << "," << p[i].vy << "," << p[i].vz << "," << p[i].mass << "\n";
+        }
+        /* code */
+    } else if (numerical_integrator == "leap-frog") {
+        if (!fileExists) {
+            csvFile << "Iteration,BodyID,PosX,PosY,PosZ,mass\n";
+        }
+        //* Escribir los datos de la simulación en el archivo
+        for (int i = 0; i < nBodies; i++) {
+            csvFile << iter << "," << i << "," << p[i].x << "," << p[i].y << "," << p[i].z << "," 
+                    "," << p[i].mass << "\n";
+        }
     }
 
     //* Cerrar el archivo
@@ -58,8 +68,9 @@ void simulationDataCollection(
     Body* p_device, 
     int nBodies, 
     int bytes, 
-    int iter) {
+    int iter,
+    std::string numerical_integrator) {
 
     CHECK_CUDA_ERROR(cudaMemcpy(p, p_device, bytes, cudaMemcpyDeviceToHost));
-    logSimulationData(p, nBodies, iter);
+    logSimulationData(p, nBodies, iter, numerical_integrator);
 }
