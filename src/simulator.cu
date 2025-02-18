@@ -12,6 +12,7 @@
 #include "velocityWrapper.cuh"
 #include "bodyForceWraper.cuh"
 #include "integrateWraper.cuh"
+#include "integratorLeapFrogWraper.cuh"
 #include "data_collector.cuh"
 
 int main(int argc, char* argv[]) {
@@ -42,17 +43,31 @@ int main(int argc, char* argv[]) {
     //~ Definiendo la velocidad inicial de las particulas
     velocityKernelLaunch( nBodies, p_device, gridDimX, blockDimX, max_particles_speed);
 
-    //~ Ciclo principal
-    for (int iter = 0; iter < nIters; iter++) {
-        execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
-        execIntegrate(nBodies, dt, p_device, gridDimX, blockDimX, integrateStride);
-        simulationDataCollection(p, p_device, nBodies, bytes, iter);
-        printProgress(iter + 1, nIters);
+    if (numerical_integrator == "euler-explicit") {
+        for (int iter = 0; iter < nIters; iter++) {
+            execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
+            execIntegrate(nBodies, dt, p_device, gridDimX, blockDimX, integrateStride);
+            simulationDataCollection(p, p_device, nBodies, bytes, iter, numerical_integrator);
+            printProgress(iter + 1, nIters);
+        }
+
+        printf("INFO - Simulation terminated\n");
+        cudaFreeMemRoutines(p_device,d_states, buf);
+        return 0;
     }
 
-    printf("INFO - Simulation terminated\n");
-
-    //~ Rutinas de liberacion de memoria
-    cudaFreeMemRoutines(p_device,d_states, buf);
-    return 0;
+    else if (numerical_integrator == "leap-frog") {
+        execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
+        execLeapFrogVelocityUpdate(nBodies, 0.5f * dt, p_device, gridDimX, blockDimX);
+        for (int iter = 0; iter < nIters; iter++) {
+            execLeapFrogPositionUpdate(nBodies, dt, p_device, gridDimX, blockDimX);
+            execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
+            execLeapFrogVelocityUpdate(nBodies, dt, p_device, gridDimX, blockDimX);
+            simulationDataCollection(p, p_device, nBodies, bytes, iter, numerical_integrator);
+            printProgress(iter + 1, nIters);
+        }
+        printf("INFO - Simulation terminated\n");
+        cudaFreeMemRoutines(p_device,d_states, buf);
+        return 0;
+    }
 }
