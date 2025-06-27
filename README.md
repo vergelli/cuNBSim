@@ -1,32 +1,25 @@
-# cuda NBSim
+# CUNBSim (Abandoned)
 
-An N-Body simulator powered by CUDA devices. This simulator models the gravitational interactions between particles in a 3D space with various initial configurations. It is currently under active development.
+A small experimental N-body simulator powered by CUDA device.  
+Originally intended to simulate gravitational interactions in 3D space using GPU acceleration.
 
-## Status
-🚧 **Work in Progress**  
-This project is still in its early stages. Some features have been implemented, while others are still being developed. The current features include:
+⚠️ **This project has been abandoned and will not be maintained or continued.**  
+It was an early attempt at learning physics-based simulation and dynamical systems. I'm keeping it public for archival purposes, but you can ignore it completely.
 
-- Gravitational force calculation using pairwise interactions.
-- Velocity kernel with dynamic velocity adjustment based on particle distance.
-- Minimum distance threshold for stable simulations.
-- Box-Muller particle initialization for random distribution.
+## What It Did
 
-![Simulation Animation](docs/2d_anim.gif)
+- Pairwise gravitational force calculation on the GPU.
+- Simple velocity and position updates.
+- Random initialization of particles using Box-Muller distribution.
 
-These visualizations were rendered using [Makie.jl](https://docs.makie.org/v0.21/) and are not part of this project (although they may be included in the future idk).
+## Visualization
 
-![Simulation Animation 2](docs/3d_anim.gif)
+The GIFs below were rendered externally using [Makie.jl](https://docs.makie.org), which is not part of this repo. I highly recommend checking this tool for Viz.
 
-## Future Work
-- Implement force optimizations
-- Improve stability in high-density scenarios
-- Add post-processing tools for result visualization
-- Collision detection and Post-collision corrections
+![2D](docs/2d_anim.gif)
 
 ---
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+## Disclaimer
 
-## Installation and Usage
-Once the project reaches a more stable state.
+This repository is no longer under development. I'm unlikely to return to it tbh.
