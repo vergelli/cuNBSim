@@ -12,4 +12,5 @@ ejemplo_prints_c.c
 requirements.txt
 *.jl
 *.mp4
+*.gif
 data/
