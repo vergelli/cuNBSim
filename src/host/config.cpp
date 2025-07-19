@@ -126,7 +126,6 @@ void initialize_configuration_variables(const nlohmann::json& config) {
         std::cout << "INFO - blockDimZ: " << blockDimZ << std::endl;
         std::cout << "INFO - integrateStride: " << integrateStride << std::endl;
     }
-
 }
 
 void load_config_from_file(const std::string& config_file, DeviceProperties deviceProps) {

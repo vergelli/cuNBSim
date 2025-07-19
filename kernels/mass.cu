@@ -1,6 +1,6 @@
 #include "body.cuh"
 #include "mass.cuh"
-
+#include "device_config.cuh"
 
 __global__ void initialize_mass(Body* p_device, int nBodies) {
 
@@ -13,7 +13,7 @@ __global__ void initialize_mass(Body* p_device, int nBodies) {
         );
 
         // Por ejemplo, podrías definir la masa como inversamente proporcional a la distancia
-        p_device[i].mass = 1.0f / (dist + MASS_SOFTENING);
+        p_device[i].mass = 1.0f / (dist + d_MASS_SOFTENING);
 
         // p_device[i].mass = some_base_mass * exp(-dist * decay_factor);
     }

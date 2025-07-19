@@ -2,14 +2,7 @@
 #include <curand_kernel.h>
 #include "body.cuh"
 #include "boxMuller.cuh"
-
-__global__ void init_curand_states(curandState* state, unsigned long seed, int nBodies) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < nBodies) {
-        //* Inicializa el estado PRNG con el seed
-        curand_init(seed, i, 0, &state[i]);
-    }
-}
+#include "mathUtils.cuh"
 
 __global__ void box_muller_kernel(Body* p_device, curandState* state, int nBodies) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;

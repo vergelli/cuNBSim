@@ -6,6 +6,7 @@
 #include "boxMullerWraper.cuh"
 #include "cuda_utils.cuh"
 #include "deviceProps.cuh"
+#include "curandKernels.cuh"
 
 void execBoxMuller(
     int nBodies, 

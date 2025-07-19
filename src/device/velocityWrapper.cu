@@ -15,6 +15,6 @@ void velocityKernelLaunch(
 
     dim3 dimGrid(gridDimX, 1, 1);
     dim3 VelocityDimBlock(blockDimX, 1, 1);
-    initialize_velocity<<<dimGrid, VelocityDimBlock>>>(p_device, nBodies, max_particles_speed);
+    initialize_velocity_random<<<dimGrid, VelocityDimBlock>>>(p_device, nBodies, max_particles_speed);
     CHECK_CUDA_ERROR(cudaDeviceSynchronize());
 }

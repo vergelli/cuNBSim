@@ -6,7 +6,7 @@
 #include "config.hpp"
 #include "memory_management.cuh"
 #include "deviceProps.cuh"
-#include "kernelsInit.cu"
+#include "kernelsInit.cuh"
 #include "boxMullerWraper.cuh"
 #include "massWraper.cuh"
 #include "velocityWrapper.cuh"
@@ -14,6 +14,10 @@
 #include "integrateWraper.cuh"
 #include "integratorLeapFrogWraper.cuh"
 #include "data_collector.cuh"
+#include "cloud.cuh"   // Incluimos el header para la simulación "cloud"
+#include "annular.cuh" // Incluimos el header para la simulación "annular"
+#include "centralBody.cuh"
+
 
 int main(int argc, char* argv[]) {
 
@@ -28,46 +32,78 @@ int main(int argc, char* argv[]) {
     Body *p = (Body*)buf;
     Body *p_device;
     curandState *d_states;
+    CentralBody *central_host = (CentralBody*)malloc(sizeof(CentralBody));
+    CentralBody *central_device;
+    if (!central_host) {
+        std::cerr << "ERROR - Could not allocate memory for central body on host." << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
-    allocateMemoryForParticles(bytes, p, p_device, d_states, nBodies);
+    //! ===============================================================================================
+    //TODO: Implementar la lectura de los parametros de la simulacion desde un archivo de configuracion
+    //! Por el momento, se declara un FLAG que define el tipo de simulacion.
+    //! En el futuro, se podria implementar una variable en el archivo de configuracion
+    //! que defina el tipo de simulacion a realizar. Por el momento, se define en el codigo.
+
+    std::string simulation_type = "annular";// 'annular' o 'cloud'
+
+    float r2 = 2.0f;
+    float r1 = 0.1f;
+    float h = 2.0f;
+
+    //! ===============================================================================================
+
+    //TODO: La funcion tiene que saber si inicializar el objeto central ono
+    //TODO: Esto solo lo puede saber si se le pasa simulation_type
+    allocateMemoryForParticles(bytes, p, p_device, d_states, nBodies, central_host, central_device);
+
+    copyConfigToDevice();
 
     //~ Inicializacion de los parametros de lanzamiento de los kernels
     kernelsLaunchParamsInit(gridDimX, blockDimX, integrateStride, deviceProps);
 
-    //~ Definiendo posicion inicial de las particulas
-    execBoxMuller( nBodies, d_states, p_device, gridDimX, blockDimX);
+    //~ _______________________________________________________________________
 
-    //~ Definiendo la masa inicial de las particulas
-    massKernelLaunch( nBodies, p_device, gridDimX, blockDimX);
+    if (simulation_type == "annular") {
+        std::cout << "INFO - Starting annular disk simulation" << std::endl;
 
-    //~ Definiendo la velocidad inicial de las particulas
-    velocityKernelLaunch( nBodies, p_device, gridDimX, blockDimX, max_particles_speed);
+        simulate_annular(
+            p_device,
+            p,
+            d_states,
+            nBodies,
+            nIters,
+            dt,
+            gridDimX,
+            blockDimX,
+            integrateStride,
+            bytes,
+            numerical_integrator,
+            max_particles_speed,
+            r1,
+            r2,
+            h,
+            central_device
+            );
+    }
+    else if (simulation_type == "cloud") {
 
-    if (numerical_integrator == "euler-explicit") {
-        for (int iter = 0; iter < nIters; iter++) {
-            execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
-            execIntegrate(nBodies, dt, p_device, gridDimX, blockDimX, integrateStride);
-            simulationDataCollection(p, p_device, nBodies, bytes, iter, numerical_integrator);
-            printProgress(iter + 1, nIters);
-        }
-
-        printf("INFO - Simulation terminated\n");
-        cudaFreeMemRoutines(p_device,d_states, buf);
-        return 0;
+        std::cout << "INFO - Starting cloud simulation" << std::endl;
+        simulate_cloud(
+            p_device,
+            p,
+            d_states,
+            nBodies,
+            nIters,
+            dt,
+            gridDimX,
+            blockDimX,
+            integrateStride,
+            bytes,
+            numerical_integrator,
+            max_particles_speed
+        );
     }
 
-    else if (numerical_integrator == "leap-frog") {
-        execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
-        execLeapFrogVelocityUpdate(nBodies, 0.5f * dt, p_device, gridDimX, blockDimX);
-        for (int iter = 0; iter < nIters; iter++) {
-            execLeapFrogPositionUpdate(nBodies, dt, p_device, gridDimX, blockDimX);
-            execBodyForce(nBodies, dt, p_device, gridDimX, blockDimX);
-            execLeapFrogVelocityUpdate(nBodies, dt, p_device, gridDimX, blockDimX);
-            simulationDataCollection(p, p_device, nBodies, bytes, iter, numerical_integrator);
-            printProgress(iter + 1, nIters);
-        }
-        printf("INFO - Simulation terminated\n");
-        cudaFreeMemRoutines(p_device,d_states, buf);
-        return 0;
-    }
+    return 0;
 }
